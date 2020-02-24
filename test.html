@@ -1,182 +1,75 @@
 <html>
-
 <head>
-    <meta charset="utf-8" />
-    <meta property="og:image" content="https://raw.githubusercontent.com/tuttlepower/VotingMap/master/VoteMap.PNG" />
-    <link rel="icon"
-        href="https://raw.githubusercontent.com/tuttlepower/tuttlepower/master/Resources/Images/facelighting.png"
-        type="Head" sizes="16x16">
-    <title>Vote Map</title>
+  <meta charset="utf-8" />
+  <title>Leaflet Control.Layers</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
 
-    <!-- Load Leaflet from CDN -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
-        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-        crossorigin="" />
-
-    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
-        integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
-        crossorigin=""></script>
-
-    <!-- Load Esri Leaflet from CDN -->
-    <script src="https://unpkg.com/esri-leaflet@2.3.0/dist/esri-leaflet.js"
-        integrity="sha512-1tScwpjXwwnm6tTva0l0/ZgM3rYNbdyMj5q6RSQMbNX6EUMhYDE3pMRGZaT41zHEvLoWEK7qFEJmZDOoDMU7/Q=="
-        crossorigin=""></script>
-
-    <!-- Load Esri Leaflet Geocoder from CDN, needed for Search Bar -->
-    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.2.14/dist/esri-leaflet-geocoder.css"
-        integrity="sha512-v5YmWLm8KqAAmg5808pETiccEohtt8rPVMGQ1jA6jqkWVydV5Cuz3nJ9fQ7ittSxvuqsvI9RSGfVoKPaAJZ/AQ=="
-        crossorigin="">
-    <script src="https://unpkg.com/esri-leaflet-geocoder@2.2.14/dist/esri-leaflet-geocoder.js"
-        integrity="sha512-uK5jVwR81KVTGe8KpJa1QIN4n60TsSV8+DPbL5wWlYQvb0/nYNgSOg9dZG6ViQhwx/gaMszuWllTemL+K+IXjg=="
-        crossorigin=""></script>
+  <!-- Load Leaflet from CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+  crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+  integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+  crossorigin=""></script>
 
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.3.3/dist/esri-leaflet.js"
+  integrity="sha512-cMQ5e58BDuu1pr9BQ/eGRn6HaR6Olh0ofcHFWe5XesdCITVuSBiBZZbhCijBe5ya238f/zMMRYIMIIg1jxv4sQ=="
+  crossorigin=""></script>
 
-        #map {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            left: 0;
-        }
 
-        #legend {
-            position: absolute;
-            left: 10px;
-            bottom: 10px;
-        }
 
-        #links {
-            position: absolute;
-            right: 10px;
-            bottom: 20px;
-        }
 
-        #info-pane {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 400;
-            padding: 1em;
-            background: white;
-        }
-    </style>
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+  </style>
 </head>
-
 <body>
 
-    <div id="map"></div>
-    <div id="info-pane" class="leaflet-bar">Hover to Inspect</div>
-    <div id="legend">
-        <img src="muddy_key_labeled_compressed.png" alt="muddy label" width="150" height="150">
-    </div>
+<div id="map"></div>
 
-    <div id="links">
-        <button
-            onclick="window.location.href = 'https://stemlounge.com/muddy-america-color-balancing-trumps-election-map-infographic/';">Original
-            Muddy Map</button>
-        <button onclick="window.location.href = 'https://github.com/tuttlepower/VotingMap';">Github</button>
-    </div>
+<script>
+  var gray = L.layerGroup();
 
+  // more than one service can be grouped together and passed to the control together
+  L.esri.basemapLayer('DarkGray').addTo(gray);
+  L.esri.basemapLayer('GrayLabels').addTo(gray);
 
-    <script type="text/javascript" src="us-votes.js"></script>
-    <script type="text/javascript" src="countypres.js"></script>
-    <script>
-        //creates variable called map and sets the view to middle of America with a zoom level of 5
-        var map = L.map('map', {
-            center: [39.0902, -95.7129],
-            zoom: 5,
-        });
+  var states = L.esri.featureLayer({
+    url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3',
+    style: function (feature) {
+      return { color: '#bada55', weight: 2 };
+    }
+  });
+  var counties = L.esri.featureLayer({
+    url: 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1',
+    style: function (feature) {
+      return { color: '#bada55', weight: 2 };
+    }
+  });
 
+  var map = L.map('map', {
+    center: [39, -97.5],
+    zoom: 4,
+    layers: [gray, states]
+  });
 
-        //Sets basemap color and features 
-        L.esri.basemapLayer('Gray').addTo(map);
+  var baseLayers = {
+    Grayscale: gray,
+    Streetmap: L.esri.basemapLayer('Streets'),
+    
+  };
 
-        //pulls county data from US
-        var counties = L.esri.featureLayer({
-            url: 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1',
-            simplifyFactor: 0.5,
-            precision: 5,
-            weight: .3,
-            //opacity:1,
-            fillOpacity: 1,
-            color: 'white',
-            //fillColor: 'white',
-            style: function (feature) {
-                for (i in us_votes) {
-                    if (feature.properties.GEOID == us_votes[i].combined_fips) {
-                        if (us_votes[i].votes_dem > us_votes[i].votes_gop) {
-                            return {
-                                //fillColor: 'hsl(250,100%,50%)'
-                                fillColor: 'hsl(' + 240 + ',' + (us_votes[i].per_point_diff) + ',' + 50 +
-                                    '%)',
-                                //fillColor: 'hsl('+ 0 +','+((Math.abs(us_votes[i].votes_dem-us_votes[i].votes_gop)/(us_votes[i].total_votes)))+','+(((1-(us_votes[i].total_votes/50)*100)/2)+50)+')',
+  var overlays = {
+    states: states,
+    counties: counties
+  };
 
-                                color: 'hsl(' + 240 + ',' + (us_votes[i].per_point_diff) + ',' + 50 + '%)',
-
-                                fillOpacity: (us_votes[i].total_votes / 59828),
-                            };
-                        } else {
-                            return {
-                                //fillColor: 'hsl(0,100%,50%)'
-                                fillColor: 'hsl(' + 0 + ',' + (us_votes[i].per_point_diff) + ',' + 50 +
-                                    '%)',
-                                //fillColor:'hsl('+ 240 +','+((Math.abs(us_votes[i].votes_dem-us_votes[i].votes_gop)/(us_votes[i].total_votes)))+','+(((1-(us_votes[i].total_votes/50)*100)/2)+50)+')',
-
-                                color: 'hsl(' + 0 + ',' + (us_votes[i].per_point_diff) + ',' + 50 + '%)',
-                                fillOpacity: (us_votes[i].total_votes / 59828),
-                            }
-                        }
-                    }
-                }
-            }
-        }).addTo(map);
-
-        var oldId;
-
-        counties.on('mouseout', function (e) {
-            document.getElementById('info-pane').innerHTML = 'Hover to Inspect';
-            counties.resetFeatureStyle(oldId);
-        });
-
-        counties.on('mouseover', function (e) {
-            oldId = e.layer.feature.id;
-            document.getElementById('info-pane').innerHTML = e.layer.feature.properties.NAME;
-            counties.setFeatureStyle(e.layer.feature.id, {
-                color: 'orange',
-                fillColor: 'orange',
-                weight: .3,
-                opacity: 1,
-                fillOpacity: 1,
-            });
-        });
-
-        //binds popups to the counties layer
-        counties.bindPopup(function (layer) {
-            for (i in us_votes) {
-                if (layer.feature.properties.GEOID == us_votes[i].combined_fips) {
-                    return L.Util.template(
-                        '<div><p><b>State: </b>' + us_votes[i].state_abbr.toString() +
-                        '</p><p><b>County Name: </b>{NAME}</p><p><b>Democratic Votes:</b> ' + us_votes[i]
-                        .votes_dem.toLocaleString() + '<b> (' + (us_votes[i].per_dem * 100).toFixed(2) +
-                        '%)</b>' + '</p><p><b>Republican Votes: </b>' + us_votes[i].votes_gop
-                        .toLocaleString() + '<b> (' + (us_votes[i].per_gop * 100).toFixed(2) + '%)</b>' +
-                        '</p></div>',
-                        layer.feature.properties);
-
-
-                }
-            }
-            //this determines what goes inside the popup for each building
-
-        });
-    </script>
+  // https://leafletjs.com/reference.html#control-layers
+  L.control.layers(baseLayers, overlays).addTo(map);
+</script>
 
 </body>
-
 </html>

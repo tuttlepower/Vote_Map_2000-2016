@@ -86,6 +86,12 @@
 			zoom: 5,
 		});
 		var year = 2000;
+		var upperfence2000 = 51327.875;
+		var upperfence2004 = 60004.5;
+		var upperfence2008 = 64140;
+		var upperfence2012 = 62942;
+		var upperfence2016 = 66148;
+
 		//Sets basemap color and features 
 		L.esri.basemapLayer('Gray').addTo(map);
 		//pulls county data from US
@@ -115,7 +121,7 @@
 
 									//fillColor:"blue",
 
-									fillOpacity: (reworked[i].votetotal / 59828),
+									fillOpacity: (reworked[i].votetotal / upperfence2000),
 								}
 
 							} else {
@@ -131,7 +137,7 @@
 
 									//fillColor:"red",
 
-									fillOpacity: (reworked[i].votetotal / 59828),
+									fillOpacity: (reworked[i].votetotal / upperfence2000),
 								}
 
 							}

@@ -26654,6 +26654,15 @@ var reworked = [
   },
   {
     "year": 2000,
+    "fips": 46102,
+    "democrat": 1667,
+    "green": 0,
+    "nonaffiliated": 34,
+    "republican": 252,
+    "votetotal": 1953
+  },
+  {
+    "year": 2000,
     "fips": 46103,
     "democrat": 11123,
     "green": 0,
@@ -61356,6 +61365,15 @@ var reworked = [
     "votetotal": 3451,
     "percent": 5.244856563,
     "winner": "republican"
+  },
+  {
+    "year": 2004,
+    "fips": 46102,
+    "democrat": 3566,
+    "green": "",
+    "nonaffiliated": 122,
+    "republican": 526,
+    "votetotal": 4214
   },
   {
     "year": 2004,
@@ -96064,6 +96082,15 @@ var reworked = [
   },
   {
     "year": 2008,
+    "fips": 46102,
+    "democrat": 2971,
+    "green": "",
+    "nonaffiliated": 12,
+    "republican": 331,
+    "votetotal": 3314
+  },
+  {
+    "year": 2008,
     "fips": 46103,
     "democrat": 17802,
     "green": "",
@@ -130769,6 +130796,15 @@ var reworked = [
   },
   {
     "year": 2012,
+    "fips": 46102,
+    "democrat": 2937,
+    "green": "",
+    "nonaffiliated": 20,
+    "republican": 188,
+    "votetotal": 3145
+  },
+  {
+    "year": 2012,
     "fips": 46103,
     "democrat": 15125,
     "green": "",
@@ -165471,6 +165507,15 @@ var reworked = [
     "votetotal": 2933,
     "percent": 23.45721105,
     "winner": "republican"
+  },
+  {
+    "year": 2016,
+    "fips": 46102,
+    "democrat": 2510,
+    "green": "",
+    "nonaffiliated": 154,
+    "republican": 241,
+    "votetotal": 2905
   },
   {
     "year": 2016,

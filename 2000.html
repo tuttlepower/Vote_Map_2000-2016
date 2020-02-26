@@ -97,12 +97,13 @@
 		//pulls county data from US
 		var counties = L.esri.featureLayer({
 			url: 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1',
-			simplifyFactor: 0.5,
+			simplifyFactor: 0.1,
 			precision: 5,
-			weight: .3,
+			weight: .5,
 			//opacity:1,
 			fillOpacity: 1,
 			color: 'white',
+			fields: ['OBJECTID','GEOID','NAME'],
 			//fillColor: 'white',
 			style: function (feature) {
 				for (i in reworked) {
@@ -111,13 +112,11 @@
 							if (reworked[i].democrat > reworked[i].republican) {
 								return {
 									//fillColor: 'hsl(250,100%,50%)'
-									fillColor: 'hsl(' + 240 + ',' + (Math.abs(reworked[i].democrat - reworked[i]
-											.republican) / reworked[i].votetotal) * 100 + '% ,' + 50 +
+									fillColor: 'hsl(' + 240 + ',' + (reworked[i].percent)+ '% ,' + 50 +
 										'%)',
 									//fillColor: 'hsl('+ 0 +','+((Math.abs(us_votes[i].votes_dem-us_votes[i].votes_gop)/(us_votes[i].total_votes)))+','+(((1-(us_votes[i].total_votes/50)*100)/2)+50)+')',
 
-									color: 'hsl(' + 240 + ',' + (Math.abs(reworked[i].democrat - reworked[i]
-										.republican) / reworked[i].votetotal) * 100 + '% ,' + 50 + '%)',
+									color: 'hsl(' + 240 + ',' + (reworked[i].percent) + '% ,' + 50 + '%)',
 
 									//fillColor:"blue",
 
@@ -127,13 +126,11 @@
 							} else {
 								return {
 									//fillColor: 'hsl(0,100%,50%)'
-									fillColor: 'hsl(' + 0 + ',' + (Math.abs(reworked[i].democrat - reworked[i]
-											.republican) / reworked[i].votetotal) * 100 + '% ,' + 50 +
+									fillColor: 'hsl(' + 0 + ',' + (reworked[i].percent) + '% ,' + 50 +
 										'%)',
 									//fillColor:'hsl('+ 240 +','+((Math.abs(us_votes[i].votes_dem-us_votes[i].votes_gop)/(us_votes[i].total_votes)))+','+(((1-(us_votes[i].total_votes/50)*100)/2)+50)+')',
 
-									color: 'hsl(' + 0 + ',' + (Math.abs(reworked[i].democrat - reworked[i]
-										.republican) / reworked[i].votetotal) * 100 + '% ,' + 50 + '%)',
+									color: 'hsl(' + 0 + ',' + (reworked[i].percent) + '% ,' + 50 + '%)',
 
 									//fillColor:"red",
 

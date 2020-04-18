@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css">
+	<link rel="stylesheet" href="leaflet.groupedlayercontrol.css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+	<script src="https://unpkg.com/esri-leaflet@2.0.7"></script>
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="leaflet.groupedlayercontrol.js"></script>
+	<script src='easy-button.js'></script>
+	<link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.2.3/dist/esri-leaflet-geocoder.css">
+	<script src="https://unpkg.com/esri-leaflet-geocoder@2.2.3"></script>
+
+<style>
+      #autocomplete {
+        z-index: 100;
+      }
+      /*
+      #map {
+        height: 700px;
+        border: 1px solid black;
+        z-index: 0;
+      }*/
+	  #wrapper {
+  margin: 0 auto;
+  width: 100%;
+}
+
+#panel{
+ float: left;
+  width: 100%;
+  height:50px;
+background-color: #175B81;
+color:white;
+}
+
+#map {
+  float: left;
+  width: 80%;
+  height:600px;
+
+}
+
+.sidebar {
+  float: left;
+  width: 20%;
+  height:600px;
+   background-color: #175B81;
+   color: black;
+}
+
+#footer {
+float: left;
+background-color: #175B81;
+color: white;
+  width: 100%;
+  height:25px
+}
+
+.text-labels     {
+	font-weight: bold;
+    color:#006400;
+	font-family: "Arial Black"
+	font-size: 20px ;
+    line-height:25px;
+    text-align:center;
+   }
+   
+table, th, td 
+	{
+		margin:0px 5px;
+		border:solid 1px #333;
+		padding:2px 4px;
+		font:10px Verdana;
+	}
+th {
+		font-size:14px;
+		font-weight:bold
+	}
+td {
+		font-size:14px;
+		font-weight:normal
+	}
+tr {
+		background: white;
+	}
+	
+tbody  tr:hover {
+		background: yellow;
+	}
+table {
+		border-collapse: collapse;
+	}  
+.table a
+{
+    display:block;
+    text-decoration:none;
+}
+#f1{
+	font-weight:bold
+}
+#pict{
+    width: auto;
+	max-width:200;
+	max-height:200;
+	object-fit: cover;
+}
+.p2 {
+    font-size: 24px;
+	font-weight:bold;
+    position: relative;
+    top: 11px;
+	left: 20px;
+}
+#logo{
+	width: auto;
+	max-width:120;
+	max-height:120;
+
+}  
+</style>
+</head>
+<body>
+  
+  <div id="wrapper">
+	<div id="panel"><span class="p2">NYS Representatives 2017</span> 
+	</div>
+  <div id="map">  </div>
+  
+  <div class="sidebar">
+	<div class="ui-widget"  style="text-align:center;">
+	      <!--<label for="autocomplete">Name: </label> -->  
+		  <input id="autocomplete" placeholder="Search for: NAME">
+	</div>  
+		<p style="text-align:center;" id="logo" ></p> 
+  		<div><p id='pict'style="text-align:center;"></p></div>
+			
+			<table style="margin: 0px auto;">
+			  <tr>
+              <th align="left">Name</th>
+              <td id='f1'></td>
+              </tr> <tr>
+              <th align="left">District</th>
+              <td id='f2'></td></tr>
+              <tr>
+			 <th align="left">Party</th>
+              <td id='f3'></td>
+              </tr> <tr>
+              <th align="left">District Phone</th>
+              <td id='f4'></td></tr>
+              <tr>
+			  <th align="left">Phone</th>
+              <td id='f5'></td>
+              </tr> <tr>
+			  <th align="left">E-mail</th>
+              <td id='f7'></td>
+              </tr> <tr>
+			  <th align="left">Website</th>
+              <td id='f8'><a href="#"></a></td>
+              </tr> 
+			</table>
+  </div>
+  <div id="footer">  </div>
+ </div>
+<script>  
+
+$(document).ready(function () {
+  var url = 'Senate.json';
+  var url2 = 'Assembly3.json'; 
+  var url3 = 'Congress1.json';  
+  
+  document.getElementById('logo').innerHTML='<img src="NYSenate.jpg" style="width:120px;height:122px";>';
+  
+  // Initialize autocomplete with empty source.
+  $( "#autocomplete" ).autocomplete();
+        
+  var map = L.map('map').setView([42.8, -75.90454], 7); 
+  
+  ///Basemaps
+	var osm=new L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',{ 
+				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'});
+	
+	// https: also suppported.
+	var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+		attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+	});
+	
+	// https: also suppported.
+	var Esri_WorldGrayCanvas = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+		attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+		maxZoom: 16
+	}).addTo(map);;
+	
+	
+	// https: also suppported.
+	var Stamen_TopOSMFeatures = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toposm-features/{z}/{x}/{y}.{ext}', {
+		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		subdomains: 'abcd',
+		minZoom: 0,
+		maxZoom: 20,
+		ext: 'png',
+		bounds: [[22, -132], [51, -56]],
+		opacity: 0.9
+	});
+	
+	var OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+	maxZoom: 18,
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+		
+	var blue = L.layerGroup([
+        Esri_WorldGrayCanvas,
+		Stamen_TopOSMFeatures
+		]); 
+ //end Basemaps
+
+	var searchControl = L.esri.Geocoding.geosearch().addTo(map);
+
+	var geocoderesults = L.layerGroup().addTo(map);
+
+	searchControl.on('results', function(data){
+		geocoderesults.clearLayers();
+		geocoderesults.addLayer(L.marker(data.results[0].latlng));
+	});	
+ 
+	
+// Set function for color ramp
+function setColor(party){
+	return party == 'D' ? 'blue' :
+	       party == 'R' ? 'red' :
+							'white';
+	       }	
+	
+// Set style function that sets fill color property
+function style2(feature) {
+    return {
+        fillColor: setColor(feature.properties.Party_1),
+        fillOpacity: 0.5,
+        weight: 2,
+        opacity: 1,
+        color: '#ffffff',
+        dashArray: '3'
+    };
+}
+
+	var highlight = {
+		'fillColor': 'yellow',
+		'weight': 2,
+		'opacity': 1
+	};
+	
+	function forEachFeature(feature, layer) {
+		layer._leaflet_id = feature.properties.NAME;
+
+		var popupContent = "<p><center> <b>" + feature.properties.NAME ;
+
+		layer.bindPopup(popupContent);
+		layer.on("click", function (e) { 
+			assembly.setStyle(style2);
+			senate.setStyle(style2); 
+			//congress.setStyle(style2); 
+			layer.setStyle(highlight); 
+			
+			var field0=document.getElementById('pict');
+					field0.innerHTML='<img src="' +e.target.feature.properties.Picture +'" style="width:auto; max-width:200px;max-height:200px;">';
+					var field1=document.getElementById('f1');
+					field1.innerHTML=e.target.feature.properties.NAME;
+					var field2=document.getElementById('f2');
+					field2.innerHTML=e.target.feature.properties.DISTRICT;
+					
+					var field3=document.getElementById('f3');
+					field3.innerHTML=e.target.feature.properties.Party;
+					var field4=document.getElementById('f4');
+					field4.innerHTML=e.target.feature.properties.dist_phone;
+					var field5=document.getElementById('f5');
+					field5.innerHTML=e.target.feature.properties.Phone;
+					var field7=document.getElementById('f7');
+					//"email": "https://peteking.house.gov/contact/email-me",
+					
+					var email = e.target.feature.properties.EMAIL;
+					//console.log(email);
+					if (email !== null){ 
+					field7.innerHTML ='<a href="mailto:'+ email +'">'+ email +'</a>' ;
+					} else{
+					field7.innerHTML = 'No E-mail Address';
+					}
+					var field8=document.getElementById('f8');
+					var wsite = e.target.feature.properties.Website;
+					if (wsite !== null){ 
+					field8.innerHTML ='<a href="'+ wsite +'" target="_blank">website</a>' ;
+					} else{
+					field8.innerHTML = 'No site recorded';
+					}
+			
+		}); 
+	}
+	
+		function forEachFeature2(feature, layer) {
+		layer._leaflet_id = feature.properties.NAME;
+
+		var popupContent = "<p><center> <b>" + feature.properties.NAME ;
+
+		layer.bindPopup(popupContent);
+		layer.on("click", function (e) { 
+			//assembly.setStyle(style2);
+			//senate.setStyle(style2); 
+			congress.setStyle(style2); 
+			layer.setStyle(highlight); 
+			
+			var field0=document.getElementById('pict');
+					field0.innerHTML='<img src="' +e.target.feature.properties.Picture +'" style="width:auto; max-width:200px;max-height:200px;">';
+					var field1=document.getElementById('f1');
+					field1.innerHTML=e.target.feature.properties.NAME;
+					var field2=document.getElementById('f2');
+					field2.innerHTML=e.target.feature.properties.DISTRICT;
+					
+					var field3=document.getElementById('f3');
+					field3.innerHTML=e.target.feature.properties.Party;
+					var field4=document.getElementById('f4');
+					field4.innerHTML=e.target.feature.properties.dist_phone;
+					var field5=document.getElementById('f5');
+					field5.innerHTML=e.target.feature.properties.Phone;
+					var field7=document.getElementById('f7');
+					var email = e.target.feature.properties.email;  
+					console.log(email);
+					if (email !== null){ 
+					field7.innerHTML ='<a href="'+ email  +'" target="_blank">E-mail</a>' ;
+					} else{
+					field7.innerHTML = 'No E-mail Address';
+					}
+					var field8=document.getElementById('f8');
+					var wsite = e.target.feature.properties.Website;
+					if (wsite !== null){ 
+					field8.innerHTML ='<a href="'+ wsite +'" target="_blank">website</a>' ;
+					} else{
+					field8.innerHTML = 'No site recorded';
+					}
+			
+		}); 
+	}
+  //////////////////
+var arr = [];
+var arr1 = [];
+var arr2 = [];
+var arr3 = [];
+  
+  var assembly = L.geoJSON(null, {onEachFeature: forEachFeature, style: style2}); 
+	$.getJSON(url2, function(data) {
+    assembly.addData(data);
+	
+	for (i = 0; i < data.features.length; i++) {
+		arr1.push({label:data.features[i].properties.NAME, value:"assembly"});
+	}
+  //console.log(arr2.length +" records in assembly");
+      addDataToAutocomplete(arr1);
+  });
+ ////////////// 
+  var congress = L.geoJSON(null, {onEachFeature: forEachFeature2, style: style2}); 
+	$.getJSON(url3, function(data) {
+    congress.addData(data);
+	
+	for (i = 0; i < data.features.length; i++) {
+	arr3.push({label:data.features[i].properties.NAME, value:"congress"});
+	}
+	//console.log(arr3.length +" records in congress");
+	addDataToAutocomplete(arr3);
+});
+ //////// 
+  
+  var senate = L.geoJSON(null, {onEachFeature: forEachFeature, style: style2}).addTo(map); 
+	$.getJSON(url, function(data) {
+    senate.addData(data);
+  	
+  	for (i = 0; i < data.features.length; i++) {
+     	arr1.push({label:data.features[i].properties.NAME, value:"senate"});
+    }
+    //console.log(arr1.length +" records in senate");
+    addDataToAutocomplete(arr1);
+  });
+  ////////// Autocomplete search
+	function addDataToAutocomplete(newArr) {
+		arr = arr.concat(newArr);
+		
+		function uniques(arr) {
+			var a = [];
+			for (var i=0, l=arr.length; i<l; i++)
+				if (a.indexOf(arr[i]) === -1 && arr[i] !== '')
+					a.push(arr[i]);
+					x =a.sort();
+			return x;
+		}
+		
+		// The source 4 autocomplete.  https://api.jqueryui.com/autocomplete/#method-option
+		$( "#autocomplete" ).autocomplete("option", "source", uniques(arr));
+		$( "#autocomplete"  ).autocomplete( "option", "minLength", 2 ); // number of char. before making list
+		$( "#autocomplete" ).on( "autocompleteselect", function( event, ui ) {
+			updateLayer(ui.item.value);
+			polySelect(ui.item.label);
+			ui.item.value='';
+		});
+	}	///////////// Autocomplete search end
+	
+	/// Change layer to value in autocomplete
+		function updateLayer(b){
+			console.log(b);
+			  switch(b) {
+			case ("assembly"):
+				assembly.addTo(map);
+				map.removeLayer(senate);
+				map.removeLayer(congress);
+				break;
+			case ("senate"):
+				senate.addTo(map);
+				map.removeLayer(assembly);
+				map.removeLayer(congress);
+				break;
+			case ("congress"):
+				congress.addTo(map);
+				map.removeLayer(assembly);
+				map.removeLayer(senate);
+				break;
+			}
+		}// end of change layer
+		
+		// fire off click event and zoom to polygon
+  		function polySelect(a){
+			map._layers[a].fire('click');
+			var layer = map._layers[a];
+			map.fitBounds(layer.getBounds());
+		}// END...fire off click event and zoom to polygon
+  
+	///   Switcher control for layers.
+	var baseMaps = {
+    "Open Street Map": osm,
+    "Imagery":Esri_WorldImagery,
+	"Gray":Esri_WorldGrayCanvas,
+	"Blue Base":blue,
+	"OSM B&W":OpenStreetMap_BlackAndWhite
+	};
+
+	//var overlayMaps
+
+	var groupedOverlays = {
+		"Reprensitives":{
+			"Senate":senate,
+			"Assembly":assembly,
+			"US House":congress
+		}
+
+	};
+
+    var options = {
+      // Make the "Landmarks" group exclusive (use radio inputs)
+      exclusiveGroups: ["Reprensitives"],
+      // Show a checkbox next to non-exclusive group labels for toggling all
+      groupCheckboxes: true
+    };
+
+    // Use the custom grouped layer control, not "L.control.layers"
+    var layerControl = L.control.groupedLayers(baseMaps, groupedOverlays, options);
+    map.addControl(layerControl);
+   // End of switcher control.
+  
+   //zoom to city and state
+  	var stateChangingButton = L.easyButton({
+    states: [{
+            stateName: 'zoom-to-NYC',   // name the state
+            icon:      'fa fa-search-plus', // and define its properties
+            title:     'Zoom to NY City', // like its title
+            onClick: function(btn, map) {  // and its callback
+                map.setView([40.700,-73.975],10);
+                btn.state('zoom-to-state'); // change state on click!
+            }
+        }, {
+            stateName: 'zoom-to-state',
+            icon:      'fa fa-search-minus',
+            title:     'Zoom to State',
+            onClick: function(btn, map) {
+                map.setView([43, -75], 7)
+                btn.state('zoom-to-NYC');
+            }
+		}]
+	});
+
+	stateChangingButton.addTo(map);
+	//END....  //zoom to city and state
+	
+	//Load agency picture when layer selected.
+    map.on('overlayadd', function (eventLayer) {
+
+	switch (eventLayer.name) {
+    case 'Senate':
+		document.getElementById('logo').innerHTML='<img src="NYSenate.jpg" style="width:120px;height:122px";>';
+        console.log( 'Senate');
+        break;
+    case "Assembly":
+		document.getElementById('logo').innerHTML='<img src="Assemblyseal.jpg" style="width:120px;height:122px;">';
+        console.log("Assembly" );
+        break;
+    case "US House":
+		document.getElementById('logo').innerHTML='<img src="Congress.png" style="width:120px;height:122px";>';
+        console.log( "US House");
+       } 
+ });
+//END Load agency picture when layer selected.
+});
+
+</script>
+</body>
+</html> 

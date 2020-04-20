@@ -1,0 +1,37 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+#legend {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+}
+
+#links {
+    position: absolute;
+    right: 10px;
+    bottom: 20px;
+}
+
+#info-pane {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 400;
+    padding: 1em;
+    background: white;
+}
+
+#demo {
+    top: 30px;
+}

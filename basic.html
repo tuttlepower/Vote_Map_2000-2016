@@ -80,88 +80,68 @@
 	</div>
 	<script type="text/javascript" src="js/reworked.js"></script>
 	<script>
+
+		////////////////////////////////////////////////////////////////////////////////////////////////
+
 		//creates variable called map and sets the view to middle of America with a zoom level of 5
 		var map = L.map('map', {
 			center: [39.0902, -95.7129],
 			zoom: 5,
 		});
+
+		////////////////////////////////////////////////////////////////////////////////////////////////
+
+		//vars for years with their upper feences 
 		var year = 2000;
+		var upperfence2000 = 51327.875;
+		var upperfence2004 = 60004.5;
+		var upperfence2008 = 64140;
+		var upperfence2012 = 62942;
+		var upperfence2016 = 66148;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////
+
 		//Sets basemap color and features 
 		L.esri.basemapLayer('Gray').addTo(map);
+
+		////////////////////////////////////////////////////////////////////////////////////////////////
 		//pulls county data from US
 		var counties = L.esri.featureLayer({
 			url: 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1',
-			simplifyFactor: 0.5,
+			simplifyFactor: 0.1,
 			precision: 5,
-			weight: .3,
-			//opacity:1,
-			fillOpacity: 1,
-			color: 'white',
-			//fillColor: 'white',
-			style: function (feature) {
-				for (i in reworked) {
-					if (feature.properties.GEOID == reworked[i].fips) {
-						if (reworked[i].year == year) {
-							if (reworked[i].democrat > reworked[i].republican) {
-								return {
-									//fillColor: 'hsl(250,100%,50%)'
-									fillColor: 'hsl(' + 240 + ',' + (Math.abs(reworked[i].democrat - reworked[i]
-											.republican) / reworked[i].votetotal) * 100 + '% ,' + 50 +
-										'%)',
-									//fillColor: 'hsl('+ 0 +','+((Math.abs(us_votes[i].votes_dem-us_votes[i].votes_gop)/(us_votes[i].total_votes)))+','+(((1-(us_votes[i].total_votes/50)*100)/2)+50)+')',
+            fields: ['OBJECTID', 'GEOID', 'NAME'],
 
-									color: 'hsl(' + 240 + ',' + (Math.abs(reworked[i].democrat - reworked[i]
-										.republican) / reworked[i].votetotal) * 100 + '% ,' + 50 + '%)',
+			////////////////////////////////////////////////////////////////////////////////////////////////
 
-									//fillColor:"blue",
-
-									fillOpacity: (reworked[i].votetotal / 59828),
-								}
-
-							} else {
-								return {
-									//fillColor: 'hsl(0,100%,50%)'
-									fillColor: 'hsl(' + 0 + ',' + (Math.abs(reworked[i].democrat - reworked[i]
-											.republican) / reworked[i].votetotal) * 100 + '% ,' + 50 +
-										'%)',
-									//fillColor:'hsl('+ 240 +','+((Math.abs(us_votes[i].votes_dem-us_votes[i].votes_gop)/(us_votes[i].total_votes)))+','+(((1-(us_votes[i].total_votes/50)*100)/2)+50)+')',
-
-									color: 'hsl(' + 0 + ',' + (Math.abs(reworked[i].democrat - reworked[i]
-										.republican) / reworked[i].votetotal) * 100 + '% ,' + 50 + '%)',
-
-									//fillColor:"red",
-
-									fillOpacity: (reworked[i].votetotal / 59828),
-								}
-
-							}
-
-						}
-					}
-				}
-			}
+			
+        ////////////////////////////////////////////////////////////////////////////////////////////////
 		}).addTo(map);
+		////////////////////////////////////////////////////////////////////////////////////////////////
 
 		var oldId;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
 
 		counties.on('mouseout', function (e) {
 			document.getElementById('info-pane').innerHTML = 'Hover to Inspect';
 			counties.resetFeatureStyle(oldId);
 		});
 
+		////////////////////////////////////////////////////////////////////////////////////////////////
+
 		counties.on('mouseover', function (e) {
 			oldId = e.layer.feature.id;
 			document.getElementById('info-pane').innerHTML = e.layer.feature.properties.NAME + ' - ' + e
 				.layer.feature
-				.properties.GEOID;
+                .properties.GEOID;
 			counties.setFeatureStyle(e.layer.feature.id, {
 				color: 'orange',
 				fillColor: 'orange',
-				weight: .3,
-				opacity: 1,
-				fillOpacity: 1,
 			});
 		});
+
+		////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//binds popups to the counties layer
 		//this determines what goes inside the popup for each county
@@ -185,9 +165,8 @@
 					}
 				}
 			}
-
-
 		});
+		////////////////////////////////////////////////////////////////////////////////////////////////
 	</script>
 
 </body>
